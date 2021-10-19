@@ -1,0 +1,55 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: order-service
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: event_store
+      username: root
+      password: root
+  datasource:
+    url: jdbc:h2:file:~/order-service;AUTO_SERVER=true
+    username: root
+    password: root
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  jpa:
+    hibernate:
+      database-platform: org.hibernate.dialect.H2Dialect
+      ddl-auto: update
+    properties:
+      hibernate:
+        ogm:
+          datastore:
+            create_database: true
+axon:
+  axonserver:
+    enabled: false
+  serializer:
+    general: jackson
+  eventhandling:
+    processors:
+      orderservice-group:
+        source: subscribableKafkaMessageSource
+        mode: SUBSCRIBING
+  kafka:
+    default-topic: orderservice-topic
+    consumer:
+      client-id: kafka-orderservice-consumer
+      group-id: orderservice-group
+      event-processor-mode: subscribing
+      bootstrap-servers: localhost:9093
+    producer:
+      client-id: kafka-orderservice-producer
+      event-processor-mode: subscribing
+      bootstrap-servers: localhost:9093
+    properties:
+      security.protocol: PLAINTEXT

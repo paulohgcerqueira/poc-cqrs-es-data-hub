@@ -1,0 +1,55 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: user-service
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      username: root
+      database: event_store
+      password: root
+  datasource:
+    url: jdbc:h2:file:~/user-service;AUTO_SERVER=true
+    username: root
+    password: root
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  jpa:
+    hibernate:
+      database-platform: org.hibernate.dialect.H2Dialect
+      ddl-auto: update
+    properties:
+      hibernate:
+        ogm:
+          datastore:
+            create_database: true
+axon:
+  axonserver:
+    enabled: false
+  serializer:
+    general: jackson
+  eventhandling:
+    processors:
+      userservice-group:
+        source: subscribableKafkaMessageSource
+        mode: SUBSCRIBING
+  kafka:
+    default-topic: userservice-topic
+    consumer:
+      client-id: kafka-userservice-consumer
+      group-id: userservice-group
+      event-processor-mode: subscribing
+      bootstrap-servers: localhost:9093
+    producer:
+      client-id: kafka-userservice-producer
+      event-processor-mode: subscribing
+      bootstrap-servers: localhost:9093
+    properties:
+      security.protocol: PLAINTEXT
